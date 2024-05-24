@@ -1,22 +1,72 @@
 const buttons = document.querySelectorAll("button");
-const result = document.querySelector(".result input");
-const clear = document.getElementsByClassName('clear')
-
-  buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const value = button.textContent;
-      if(button.classList.contains('clear')) {
-        result.value = '';
-      }else{
-        result.value += value;
-      }
-
-    });
-  });
+const display = document.querySelector(".result input");
 
 let num1 = "";
 let num2 = "";
 let operator = "";
+let shouldResetDisplay = false;
+// handle the clicking
+buttons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const value = button.textContent;
+    if (button.classList.contains("clear")) {
+      clearDisplay();
+    } else if (button.classList.contains("operator")) {
+      handleOperator(value);
+    } else if (button.classList.contains("results")) {
+      calculateResult();
+    } else {
+      newNumber(value);
+    }
+  });
+});
+
+function clearDisplay() {
+  num1 = "";
+  num2 = "";
+  operator = "";
+  display.value = "";
+  shouldResetDisplay = false;
+}
+
+function handleOperator(op) {
+  if (num1 && !num2 && operator) {
+    operator = op;
+  } else if (num1 && num2) {
+    calculateResult();
+    operator = op;
+    num1 = display.value;
+    num2 = "";
+    shouldResetDisplay = true;
+  } else {
+    operator = op;
+    num1 = display.value;
+    shouldResetDisplay = true;
+  }
+}
+// calculate the numbers
+
+function calculateResult() {
+  if (num1 && operator) {
+    num2 = display.value;
+    result = operate(operator, parseFloat(num1), parseFloat(num2));
+    display.value = result;
+    num1 = display.value;
+    num2 = "";
+    operator = "";
+    shouldResetDisplay = true;
+  }
+}
+// create new number
+
+function newNumber(number) {
+  if (shouldResetDisplay) {
+    display.value = "";
+    shouldResetDisplay = false;
+  }
+
+  display.value += number;
+}
 
 function add(num1, num2) {
   return num1 + num2;
